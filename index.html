@@ -1,11 +1,30 @@
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script>
   async function loadModel() {
     const model = await tf.loadGraphModel('path/to/tfjs_model/model.json');
     const inputTensor = tf.randomNormal([1, 5]);  // Adjust input as necessary
     const output = model.predict(inputTensor);
-    output.print();
+    try{
+      output.print();
+    } catch (error){
+      console.log("Error "+error)
+    }
+    try{
+      console.log(output);
+    } catch (error){
+      console.log("Error "+error)
+    }
   }
 
   loadModel();
 </script>
+</body>
+</html>
