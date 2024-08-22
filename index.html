@@ -1,0 +1,11 @@
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script>
+  async function loadModel() {
+    const model = await tf.loadGraphModel('path/to/tfjs_model/model.json');
+    const inputTensor = tf.randomNormal([1, 5]);  // Adjust input as necessary
+    const output = model.predict(inputTensor);
+    output.print();
+  }
+
+  loadModel();
+</script>
