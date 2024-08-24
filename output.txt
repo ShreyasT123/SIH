@@ -1,0 +1,110 @@
+Epoch 1/10, Loss: 0.6610991223291918
+Epoch 1/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 2/10, Loss: 0.5300904837521639
+Epoch 2/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 3/10, Loss: 0.39836097847331653
+Epoch 3/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 4/10, Loss: 0.3340875276110389
+Epoch 4/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 5/10, Loss: 0.31792201508175244
+Epoch 5/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 6/10, Loss: 0.31514938311143353
+Epoch 6/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 7/10, Loss: 0.31422879885543475
+Epoch 7/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 8/10, Loss: 0.3137859878214923
+Epoch 8/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 9/10, Loss: 0.31357765062288806
+Epoch 9/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148
+Epoch 10/10, Loss: 0.3134725744074041
+Epoch 10/10 Metrics:
+  Accuracy: 1.0000
+  Precision: 1.0000
+  Recall: 1.0000
+  F1 Score: 1.0000
+  Confusion Matrix:
+    True Negatives: 152
+    False Positives: 0
+    False Negatives: 0
+    True Positives: 148

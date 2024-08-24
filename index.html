@@ -1,30 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <title>TensorFlow.js Boston Housing Regression</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script>
-  async function loadModel() {
-    const model = await tf.loadGraphModel('path/to/tfjs_model/model.json');
-    const inputTensor = tf.randomNormal([1, 5]);  // Adjust input as necessary
-    const output = model.predict(inputTensor);
-    try{
-      output.print();
-    } catch (error){
-      console.log("Error "+error)
-    }
-    try{
-      console.log(output);
-    } catch (error){
-      console.log("Error "+error)
-    }
-  }
+    <h1>TensorFlow.js Boston Housing Regression</h1>
+    <button id="train-model">Train and Save Model</button>
+    <button id="load-model">Load and Predict with Model</button>
+    <script>
+        async function loadData() {
+            const csvUrl = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/housing.csv';
+            const dataset = await fetch(csvUrl).then(response => response.text());
+            const data = dataset.split('\n').slice(1).map(line => line.split(',').map(Number));
+            const xs = data.map(row => row.slice(0, -1)); // Features
+            const ys = data.map(row => [row[row.length - 1]]); // Target (price)
+            return { xs: tf.tensor2d(xs), ys: tf.tensor2d(ys) };
+        }
 
-  loadModel();
-</script>
+        async function run() {
+            const { xs, ys } = await loadData();
+
+            // Create the model
+            const model = tf.sequential();
+            model.add(tf.layers.dense({ units: 10, activation: 'relu', inputShape: [xs.shape[1]] }));
+            model.add(tf.layers.dense({ units: 1 }));
+
+            // Compile the model
+            model.compile({ optimizer: 'adam', loss: 'meanSquaredError' });
+
+            // Train the model
+            await model.fit(xs, ys, { epochs: 50, validationSplit: 0.2 });
+
+            // Save the model
+            await model.save('downloads://my-model');
+            console.log('Model saved successfully');
+        }
+
+        async function loadAndPredict() {
+            // Load the model
+            const model = await tf.loadLayersModel('http://localhost:8000/model/my-model.json');
+            console.log('Model loaded successfully');
+
+            // Create some dummy input data for prediction
+            const testXs = tf.tensor2d([[0.06, 0.05, 0.04, 0.03]]);
+            const predictions = model.predict(testXs);
+            predictions.print();
+        }
+
+        document.getElementById('train-model').addEventListener('click', run);
+        document.getElementById('load-model').addEventListener('click', loadAndPredict);
+    </script>
 </body>
 </html>

@@ -1,113 +1,57 @@
-import torch
-from torchmetrics import Accuracy,F1Score,ConfusionMatrix,Recall,Precision
-from torch import nn,optim
-from torch.utils.data import DataLoader,Dataset
-
-
-class NN(nn.Module):
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+import tensorflow as tf
+import keras # Standalone keras
+import numpy as np
+class NN(keras.Model):
     def __init__(self):
-        super(NN, self).__init__()
-        self.layers = nn.Sequential(  #  DEFINE MODEL LAYERS
-            nn.Linear(5,5),
-            nn.GELU(),
-            nn.Linear(5,4),
-            nn.GELU(),
-            nn.Linear(4,4),
-            nn.GELU(),    
-            nn.Linear(4,2),
-            nn.Sigmoid()
-        )
-    def forward(self,x:torch.Tensor)->torch.Tensor: #DEFINE FORWARD COMPUTATION
-        return self.layers(x) 
+        super(NN,self).__init__()
+        self.fc1 = keras.layers.Dense(units=5, activation=keras.activations.gelu)
+        self.fc2 = keras.layers.Dense(4, activation=keras.activations.gelu)
+        self.fc3 = keras.layers.Dense(3, activation=keras.activations.gelu)
+        self.fc4 =  keras.layers.Dense(2, activation=keras.activations.sigmoid)
+        
 
-#CREATE DATASET
-class Trainset(Dataset):
-    def __init__(self):
-        pass
-    def __getitem__(self,index):
-        pass
-    def __len__(self):
-        pass
+    def call(self, x):
+        x = self.fc1(x)
+        x = self.fc2(x)
+        x = self.fc3(x)
+        return self.fc4(x)    
 
+# Number of samples and feature shape
+num_samples = 1000
+feature_shape = (5,)
 
-trainset  = Trainset()
-testset = Trainset()
-# CREATE DATALOADER
-trainloader = DataLoader(trainset, batch_size=4,shuffle=True)
+# Generate random features
+features = np.random.rand(num_samples, *feature_shape)
 
-testloader = DataLoader(testset,batch_size=4,shuffle=False)
+# Add noise to the first half of the dataset
+noise = np.random.normal(loc=0.0, scale=0.1, size=features[:num_samples//2].shape)
+features[:num_samples//2] += noise
 
+# Create labels: 0 for noisy, 1 for non-noisy
+labels = np.ones(num_samples)
+labels[:num_samples//2] = 0
+
+# Create a TensorFlow dataset
+dataset = tf.data.Dataset.from_tensor_slices((features, labels))
+
+# Shuffle and batch the dataset
+dataset = dataset.shuffle(buffer_size=num_samples).batch(32)
+
+# Split into training and validation datasets
+train_size = int(0.8 * num_samples)
+train_dataset = dataset.take(train_size)
+val_dataset = dataset.skip(train_size)
+
+# Instantiate and compile the model
 model = NN()
-# DEFINE LOSS AND OPTIMIZER
-criterion = nn.BCELoss()
+model.build((32, 5))
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
+model.summary()
 
-opimizer = optim.Adam(model.parameters(), lr=1e-5)
-accuracy = Accuracy(task='binary')
-# Precision metric for binary classification
-precision = Precision(task="binary")
-f1 = F1Score(task="binary")
-recall = Recall(task="binary")
-confusion_matrix = ConfusionMatrix(task="binary")
+# Test the model call
+model.fit(train_dataset,)
 
-
-#DEFINE TRAIN LOOP
-epochs = 2
-
-for epoch in  range(1,epochs+1):
-    # train 
-    for batch_idx,features,labels in enumerate(trainloader):
-        opimizer.zero_grad()
-        logits = model(features)
-        loss = criterion(logits,labels)
-        loss.backward()
-        opimizer.step()
-        if batch_idx % 100 == 0:
-            print("batch {} : loss = {}".format(epoch*batch_idx,loss.detach().item()))
-            
-    for batch_idx,features,labels in enumerate(testloader):  
-        logits = model(features)
-        
-        accuracy.update(logits, labels)
-        precision.update(logits, labels)
-        recall.update(logits, labels)
-        f1.update(logits, labels)
-        confusion_matrix.update((logits >= 0.5).long(), labels)
-        
-        epoch_accuracy = accuracy.compute()
-        epoch_precision = precision.compute()
-        epoch_recall = recall.compute()
-        epoch_f1 = f1.compute()
-        epoch_confusion_matrix = confusion_matrix.compute()
-        
-
-        accuracy.reset()
-        precision.reset()
-        recall.reset()
-        f1.reset()
-        confusion_matrix.reset()
-
-        print(f'Accuracy: {epoch_accuracy.item()}')
-        print(f'Precision: {epoch_precision.item()}')
-        print(f'Recall: {epoch_recall.item()}')
-        print(f'F1 Score: {epoch_f1.item()}')
-        print(f'Confusion Matrix:\n{epoch_confusion_matrix}')
-
-
-#export model
-
-
-model.eval()
-
-dummy_input = torch.randn(4,5)
-
-torch.onnx.export(
-    model=model,
-    args=dummy_input,
-    f='model.onnx',
-    input_names=['input'],
-    output_names=["output"],
-    export_params=True,
-    verbose=True
-)
-
-
+# Save the model
+model.save('./modelpy',overwrite=True,)
