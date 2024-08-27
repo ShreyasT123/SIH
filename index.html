@@ -1,55 +1,67 @@
+import * as tf from '@tensorflow/tfjs';
+
+// Define the model
+const createModel = () => {
+    const model = tf.sequential();
+    model.add(tf.layers.dense({units: 64, activation: 'relu', inputShape: [12]}));  // Adjust inputShape
+    model.add(tf.layers.dense({units: 32, activation: 'relu'}));
+    model.add(tf.layers.dense({units: 16, activation: 'relu'}));
+    model.add(tf.layers.dense({units: 2, activation: 'softmax'}));  // Two classes: human (0) and bot (1)
+    model.compile({
+        optimizer: 'adam',
+        loss: 'sparseCategoricalCrossentropy',
+        metrics: ['accuracy']
+    });
+    return model;
+};
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TensorFlow.js Boston Housing Regression</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <title>TensorFlow.js Model</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs" type="module"></script>
 </head>
 <body>
-    <h1>TensorFlow.js Boston Housing Regression</h1>
-    <button id="train-model">Train and Save Model</button>
-    <button id="load-model">Load and Predict with Model</button>
     <script>
-        async function loadData() {
-            const csvUrl = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/housing.csv';
-            const dataset = await fetch(csvUrl).then(response => response.text());
-            const data = dataset.split('\n').slice(1).map(line => line.split(',').map(Number));
-            const xs = data.map(row => row.slice(0, -1)); // Features
-            const ys = data.map(row => [row[row.length - 1]]); // Target (price)
-            return { xs: tf.tensor2d(xs), ys: tf.tensor2d(ys) };
-        }
-
-        async function run() {
-            const { xs, ys } = await loadData();
-
-            // Create the model
-            const model = tf.sequential();
-            model.add(tf.layers.dense({ units: 10, activation: 'relu', inputShape: [xs.shape[1]] }));
-            model.add(tf.layers.dense({ units: 1 }));
-
-            // Compile the model
-            model.compile({ optimizer: 'adam', loss: 'meanSquaredError' });
-
-            // Train the model
-            await model.fit(xs, ys, { epochs: 50, validationSplit: 0.2 });
-
-            // Save the model
-            await model.save('downloads://my-model');
-            console.log('Model saved successfully');
-        }
-
-        async function loadAndPredict() {
-            // Load the model
-            const model = await tf.loadLayersModel('http://localhost:8000/model/my-model.json');
+        async function loadModel() {
+            const model = await tf.loadLayersModel('localstorage://my-model-tfjs');
             console.log('Model loaded successfully');
-
-            // Create some dummy input data for prediction
-            const testXs = tf.tensor2d([[0.06, 0.05, 0.04, 0.03]]);
-            const predictions = model.predict(testXs);
-            predictions.print();
+            
+            // Prepare input data (ensure it matches the expected shape)
+            const input = tf.tensor2d([[/* 12 feature values here */]], [1, 12]);  // Replace with actual data
+            
+            // Predict
+            const prediction = model.predict(input);
+            prediction.print();
         }
-
-        document.getElementById('train-model').addEventListener('click', run);
-        document.getElementById('load-model').addEventListener('click', loadAndPredict);
+        
+        loadModel().catch(console.error);
     </script>
 </body>
 </html>
+
+// Create and compile the model
+const model = createModel();
+
+// Example data
+const X_train = tf.tensor2d([...]);  // Replace with actual training data
+const y_train = tf.tensor1d([...]);  // Replace with actual labels
+
+// Train the model
+const trainModel = async () => {
+    await model.fit(X_train, y_train, {
+        epochs: 10,
+        batchSize: 32,
+        validationSplit: 0.3,
+        callbacks: tf.callbacks.earlyStopping({monitor: 'loss'})
+    });
+    console.log('Model trained successfully');
+};
+
+// Save the model
+const saveModel = async () => {
+    await model.save('localstorage://my-model-tfjs');
+    console.log('Model saved to local storage');
+};
+
+// Train and save the model
+trainModel().then(saveModel).catch(console.error);
